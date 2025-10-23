@@ -4,7 +4,7 @@ export async function getTransactionByUserId (req,res) {
       try {
     const { userId } = req.params;
     const transactions = await sql`
-      SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC
+      SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY create_at DESC
     `;
     res.status(200).json(transactions);
   } catch (error) {
@@ -41,7 +41,7 @@ export async function deleteTransaction (req, res) {
     try {
         const {id} = req.params;
 
-        if (isNaN(parseInt(id))) {
+        if (inNaN (parseInt(id))) {
             return res.status(400).json({message: "Invalid transactions Id"});
         }
 
@@ -61,7 +61,7 @@ export async function deleteTransaction (req, res) {
 };
 
 
-export async function getSummary(req, res) {
+export async function getSummary(res,req) {
         try {
 
         const {userId} = req.params;

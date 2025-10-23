@@ -14,7 +14,7 @@ export async function initDB() {
          title VARCHAR(255) NOT NULL,
          amount DECIMAL(10,2) NOT NULL,
          category VARCHAR(255) NOT NULL,
-         create_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+         create_at DATE NOT NULL DEFAULT CURRENT_DATE
         )`;
 
         console.log("database initialized successfully");
