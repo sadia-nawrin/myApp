@@ -8,7 +8,7 @@ export async function getTransactionByUserId (req,res) {
     `;
     res.status(200).json(transactions);
   } catch (error) {
-    console.error("Error getting the transaction:", error.message);
+    console.error("Error getting the transaction:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -37,56 +37,56 @@ export async function createTransaction(req,res) {
 };
 
 
-export async function deleteTransaction (req, res) {
-    try {
-        const {id} = req.params;
+export async function deleteTransaction(req, res) {
+  try {
+    const { id } = req.params;
 
-        if (inNaN (parseInt(id))) {
-            return res.status(400).json({message: "Invalid transactions Id"});
-        }
-
-        const result = await sql `
-        DELETE from transactions WHERE id =${id} RETURNING *`;
-
-        if(result.length === 0){
-            return res.status(404).json({ message: "Transaction not found"});
-        }
-
-        res.status(200).json({ message:"transactions deleted successfully"});
-
-    } catch (error) {
-           console.error("Error deleting the transaction:", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    if (isNaN(parseInt(id))) {
+      return res.status(400).json({ message: "Invalid transaction ID" });
     }
-};
+
+    const result = await sql`
+      DELETE FROM transactions WHERE id = ${id} RETURNING *
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    res.status(200).json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    console.log("Error deleting the transaction", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 
-export async function getSummary(res,req) {
-        try {
+export async function getSummary(req, res) {
+ try {
+    const { userId } = req.params;
 
-        const {userId} = req.params;
-        
-    const balanceResult = await sql `
-    SELECT COALESCE(SUM(amount), 0) as balance FROM transactions WHERE user_id = ${userId} `
+    const balanceResult = await sql`
+      SELECT COALESCE(SUM(amount), 0) as balance FROM transactions WHERE user_id = ${userId}
+    `;
 
-    const incomeResult = await sql `
-    SELECT COALESCE(SUM(amount), 0) as income FROM transactions WHERE user_id = ${userId} AND amount > 0  `
+    const incomeResult = await sql`
+      SELECT COALESCE(SUM(amount), 0) as income FROM transactions
+      WHERE user_id = ${userId} AND amount > 0
+    `;
 
-    
-    const expensesResult = await sql `
-    SELECT COALESCE(SUM(amount), 0) as expenses FROM transactions WHERE user_id = ${userId} AND amount < 0  `
+    const expensesResult = await sql`
+      SELECT COALESCE(SUM(amount), 0) as expenses FROM transactions
+      WHERE user_id = ${userId} AND amount < 0
+    `;
 
     res.status(200).json({
-        balance: balanceResult[0].balance,
-        income: incomeResult[0].income,
-        expenses: expensesResult[0].expenses,
-    })
-
-    
-        
-    } catch (error) {
-        console.error("Error getting the summary transaction:", error.message);
+      balance: balanceResult[0].balance,
+      income: incomeResult[0].income,
+      expenses: expensesResult[0].expenses,
+    });
+  } catch (error) {
+    console.log("Error gettin the summary", error);
     res.status(500).json({ message: "Internal server error" });
-    }
+  }
 };
 
